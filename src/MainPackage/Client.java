@@ -1,3 +1,5 @@
+package MainPackage;
+
 import com.google.gson.Gson;
 
 public class Client {
@@ -8,9 +10,10 @@ public class Client {
     public float y;
     public float z;
     public float inc;
+    public float rotation;
     Gson gson;
 
-    public Client(int id, String playerName, float x, float y, float z, float inc) {
+    public Client(int id, String playerName, float x, float y, float z, float inc, float rotation) {
         System.out.println("New Client: " + id + "|" + playerName + "|" + x + "|" + y + "|" + z + "|" + inc);
         this.id = id;
         this.playerName = playerName;
@@ -18,6 +21,7 @@ public class Client {
         this.y = y;
         this.z = z;
         this.inc = inc;
+        this.rotation = rotation;
         Gson gson = new Gson();
     }
 
@@ -32,6 +36,8 @@ public class Client {
         sb.append(this.y);
         sb.append("|");
         sb.append(this.inc);
+        sb.append("|");
+        sb.append(this.rotation);
         return String.valueOf(sb);
     }
 

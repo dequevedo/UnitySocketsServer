@@ -1,3 +1,5 @@
+package MainPackage;
+
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.List;
@@ -24,13 +26,13 @@ public class TCPServerAtivosHandler extends Thread {
     }
 
     public synchronized void messageDispatcher() throws IOException {
-        System.out.println("entrou no msgDispatcher");
-        String message="";
+        //System.out.println("entrou no msgDispatcher");
+        String message = "";
         char[] messageChar = message.toCharArray();
         List<TCPServerConnection> clientes = this.caller.getClientes();
-        
+
         StringBuilder sb = new StringBuilder();
-        
+
         for (TCPServerConnection cli : clientes) {
             sb.append(cli.client.toString());
             sb.append(";");
@@ -40,7 +42,7 @@ public class TCPServerAtivosHandler extends Thread {
         for (TCPServerConnection cli : clientes) {
             if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
                 messageChar = message.toCharArray();
-                messageChar[messageChar.length-1] = ' ';
+                messageChar[messageChar.length - 1] = ' ';
                 cli.getOutput().println(messageChar);
                 cli.getOutput().flush();
             }
@@ -61,10 +63,10 @@ public class TCPServerAtivosHandler extends Thread {
                 if (message == null || message.equals("")) {
                     break;
                 }
-                System.out.println("message: " + message);
+                //System.out.println("message: " + message);
                 if (message.matches("[0-9]+")) {
                     int tecla = Integer.parseInt(message);
-                    System.out.println("entrou no switch case");
+                    //System.out.println("entrou no switch case");
                     switch (tecla) {
                         case KeyEvent.VK_A:
                             if (cliente.client.inc > 0) {
@@ -97,6 +99,14 @@ public class TCPServerAtivosHandler extends Thread {
                             break;
                         case KeyEvent.VK_UP:
                             cliente.client.y += cliente.client.inc;
+                            break;
+                        case KeyEvent.VK_Z:
+                            cliente.client.rotation -= 1f;
+                            System.out.println("Apertou Z, valor da Rotação: " + cliente.client.rotation);
+                            break;
+                        case KeyEvent.VK_X:
+                            cliente.client.rotation += 1f;
+                            System.out.println("Apertou X, valor da Rotação: " + cliente.client.rotation);
                             break;
                         default:
                             break;
