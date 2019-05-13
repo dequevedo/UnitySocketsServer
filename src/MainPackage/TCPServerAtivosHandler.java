@@ -49,7 +49,6 @@ public class TCPServerAtivosHandler extends Thread {
     }
 
     public synchronized void messageDispatcherShot() throws IOException {
-        //System.out.println("entrou no msgDispatcher");
         float x = cliente.client.x;
         float y = cliente.client.y;
         float r = cliente.client.rotation;
@@ -71,91 +70,105 @@ public class TCPServerAtivosHandler extends Thread {
     @Override
     public void run() {
 
-        String message = "";
+        String fullMessage = "";
         while (true) {
             try {
                 if (this.cliente.getSocket().isConnected() && this.cliente.getInput() != null) {
-                    message = this.cliente.getInput().readLine();
+                    fullMessage = this.cliente.getInput().readLine();
                 } else {
                     break;
                 }
-                if (message == null || message.equals("")) {
+                if (fullMessage == null || fullMessage.equals("")) {
                     break;
                 }
-                //System.out.println("message: " + message);
-                if (message.matches("[0-9]+")) {
-                    int tecla = Integer.parseInt(message);
-                    //System.out.println("entrou no switch case");
-                    switch (tecla) {
-                        case KeyEvent.VK_A:
-                            if (cliente.client.inc > 0) {
-                                cliente.client.inc--;
-                            }
-                            messageDispatcher();
-                            break;
-                        case KeyEvent.VK_S:
-                            if (cliente.client.inc < 1) {
-                                cliente.client.inc++;
-                            }
-                            messageDispatcher();
-                            break;
-                        case KeyEvent.VK_Q:
-                            if (cliente.client.z > 2) {
-                                cliente.client.z--;
-                            }
-                            break;
-                        case KeyEvent.VK_W:
-                            if (cliente.client.z < 20) {
-                                cliente.client.z++;
-                            }
-                            messageDispatcher();
-                            break;
-                        case KeyEvent.VK_RIGHT:
-                            cliente.client.x += cliente.client.inc;
 
-                            messageDispatcher();
-                            break;
-                        case KeyEvent.VK_LEFT:
-                            cliente.client.x -= cliente.client.inc;
-                            messageDispatcher();
-                            break;
-                        case KeyEvent.VK_DOWN:
-                            cliente.client.y -= cliente.client.inc;
-                            messageDispatcher();
-                            break;
-                        case KeyEvent.VK_UP:
-                            cliente.client.y += cliente.client.inc;
-                            messageDispatcher();
-                            break;
-                        case KeyEvent.VK_Z:
-                            cliente.client.rotation -= 1f;
-                            messageDispatcher();
-                            System.out.println("Apertou Z, valor da Rotação: " + cliente.client.rotation);
-                            break;
-                        case KeyEvent.VK_X:
-                            cliente.client.rotation += 1f;
-                            messageDispatcher();
-                            System.out.println("Apertou X, valor da Rotação: " + cliente.client.rotation);
-                            break;
-                        case KeyEvent.VK_C: //NUM 67
-                            //cliente.client.shot = true;
-                            messageDispatcherShot();
-                            System.out.println("Atirou! ");
-                            break;
-                        default:
-                            break;
-                    }
-                } else {
-                    cliente.client.playerName = message;
-                    System.out.println("playerName: " + cliente.client.playerName);
+                //Split message received, and print obtained values
+                System.out.println("Full Message: " + fullMessage);
+                String[] subMessages = fullMessage.split("\\|");
+                for (int i = 0; i < subMessages.length; i++) {
+                    //System.out.println("Message [" + i + "] :" + subMessages[i]);
                 }
 
-                cliente.client.shot = false;
+                //Check message type
+                if (subMessages[0].equals("&connect")) {
+                    cliente.client.playerName = subMessages[1];
+                    System.out.println("PlayeName definido: " + cliente.client.playerName);
+                }
+
+                if (subMessages[0].equals("&input")) {
+                    messageInput(subMessages[1]);
+                }
             } catch (Exception ex) {
                 System.out.println("exception error: " + ex.getMessage());
                 break;
             }
         }
         encerrar();
+    }
+
+    public void messageInput(String message) {
+        try {
+            if (message.matches("[0-9]+")) {
+                int tecla = Integer.parseInt(message);
+                //System.out.println("entrou no switch case");
+                switch (tecla) {
+                    case KeyEvent.VK_A:
+                        if (cliente.client.inc > 0) {
+                            cliente.client.inc--;
+                        }
+                        messageDispatcher();
+                        break;
+                    case KeyEvent.VK_S:
+                        if (cliente.client.inc < 1) {
+                            cliente.client.inc++;
+                        }
+                        messageDispatcher();
+                        break;
+                    case KeyEvent.VK_Q:
+                        if (cliente.client.z > 2) {
+                            cliente.client.z--;
+                        }
+                        break;
+                    case KeyEvent.VK_W:
+                        if (cliente.client.z < 20) {
+                            cliente.client.z++;
+                        }
+                        messageDispatcher();
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                        cliente.client.x += cliente.client.inc;
+
+                        messageDispatcher();
+                        break;
+                    case KeyEvent.VK_LEFT:
+                        cliente.client.x -= cliente.client.inc;
+                        messageDispatcher();
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        cliente.client.y -= cliente.client.inc;
+                        messageDispatcher();
+                        break;
+                    case KeyEvent.VK_UP:
+                        cliente.client.y += cliente.client.inc;
+                        messageDispatcher();
+                        break;
+                    case KeyEvent.VK_Z:
+                        cliente.client.rotation -= 1f;
+                        messageDispatcher();
+                        break;
+                    case KeyEvent.VK_X:
+                        cliente.client.rotation += 1f;
+                        messageDispatcher();
+                        break;
+                    case KeyEvent.VK_C: //NUM 67
+                        messageDispatcherShot();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        } catch (Exception ex) {
+
+        }
     }
 }
