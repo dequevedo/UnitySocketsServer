@@ -52,7 +52,8 @@ public class TCPServerAtivosHandler extends Thread {
         //System.out.println("entrou no msgDispatcher");
         float x = cliente.client.x;
         float y = cliente.client.y;
-        String message = "&shoot|" + x + "|" + y;
+        float r = cliente.client.rotation;
+        String message = "&shoot|" + x + "|" + y + "|" + r;
         char[] messageChar = message.toCharArray();
         List<TCPServerConnection> clientes = this.caller.getClientes();
 
