@@ -33,7 +33,7 @@ public class TCPServerAtivosHandler extends Thread {
         StringBuilder sb = new StringBuilder();
 
         for (TCPServerConnection cli : clientes) {
-            sb.append(cli.client.toString());
+            sb.append("&move|" + cli.client.toString());
             sb.append(";");
             message = String.valueOf(sb);
         }
@@ -52,7 +52,7 @@ public class TCPServerAtivosHandler extends Thread {
         //System.out.println("entrou no msgDispatcher");
         float x = cliente.client.x;
         float y = cliente.client.y;
-        String message = "&|" + x + "|" + y;
+        String message = "&shoot|" + x + "|" + y;
         char[] messageChar = message.toCharArray();
         List<TCPServerConnection> clientes = this.caller.getClientes();
 
@@ -61,7 +61,6 @@ public class TCPServerAtivosHandler extends Thread {
         for (TCPServerConnection cli : clientes) {
             if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
                 messageChar = message.toCharArray();
-                //messageChar[messageChar.length - 1] = ' ';
                 cli.getOutput().println(messageChar);
                 cli.getOutput().flush();
             }
