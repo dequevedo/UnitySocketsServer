@@ -11,6 +11,7 @@ public class Client {
     public float z;
     public float inc;
     public float rotation;
+    public boolean shot = false;
     Gson gson;
 
     public Client(int id, String playerName, float x, float y, float z, float inc, float rotation) {
@@ -38,6 +39,8 @@ public class Client {
         sb.append(this.inc);
         sb.append("|");
         sb.append(this.rotation);
+        sb.append("|");
+        sb.append(this.shot);
         return String.valueOf(sb);
     }
 

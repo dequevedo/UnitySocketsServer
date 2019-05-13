@@ -26,7 +26,6 @@ public class TCPServerAtivosHandler extends Thread {
     }
 
     public synchronized void messageDispatcher() throws IOException {
-        //System.out.println("entrou no msgDispatcher");
         String message = "";
         char[] messageChar = message.toCharArray();
         List<TCPServerConnection> clientes = this.caller.getClientes();
@@ -43,6 +42,26 @@ public class TCPServerAtivosHandler extends Thread {
             if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
                 messageChar = message.toCharArray();
                 messageChar[messageChar.length - 1] = ' ';
+                cli.getOutput().println(messageChar);
+                cli.getOutput().flush();
+            }
+        }
+    }
+
+    public synchronized void messageDispatcherShot() throws IOException {
+        //System.out.println("entrou no msgDispatcher");
+        float x = cliente.client.x;
+        float y = cliente.client.y;
+        String message = "&|" + x + "|" + y;
+        char[] messageChar = message.toCharArray();
+        List<TCPServerConnection> clientes = this.caller.getClientes();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (TCPServerConnection cli : clientes) {
+            if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
+                messageChar = message.toCharArray();
+                //messageChar[messageChar.length - 1] = ' ';
                 cli.getOutput().println(messageChar);
                 cli.getOutput().flush();
             }
@@ -72,11 +91,13 @@ public class TCPServerAtivosHandler extends Thread {
                             if (cliente.client.inc > 0) {
                                 cliente.client.inc--;
                             }
+                            messageDispatcher();
                             break;
                         case KeyEvent.VK_S:
                             if (cliente.client.inc < 1) {
                                 cliente.client.inc++;
                             }
+                            messageDispatcher();
                             break;
                         case KeyEvent.VK_Q:
                             if (cliente.client.z > 2) {
@@ -87,26 +108,39 @@ public class TCPServerAtivosHandler extends Thread {
                             if (cliente.client.z < 20) {
                                 cliente.client.z++;
                             }
+                            messageDispatcher();
                             break;
                         case KeyEvent.VK_RIGHT:
                             cliente.client.x += cliente.client.inc;
+
+                            messageDispatcher();
                             break;
                         case KeyEvent.VK_LEFT:
                             cliente.client.x -= cliente.client.inc;
+                            messageDispatcher();
                             break;
                         case KeyEvent.VK_DOWN:
                             cliente.client.y -= cliente.client.inc;
+                            messageDispatcher();
                             break;
                         case KeyEvent.VK_UP:
                             cliente.client.y += cliente.client.inc;
+                            messageDispatcher();
                             break;
                         case KeyEvent.VK_Z:
                             cliente.client.rotation -= 1f;
+                            messageDispatcher();
                             System.out.println("Apertou Z, valor da Rotação: " + cliente.client.rotation);
                             break;
                         case KeyEvent.VK_X:
                             cliente.client.rotation += 1f;
+                            messageDispatcher();
                             System.out.println("Apertou X, valor da Rotação: " + cliente.client.rotation);
+                            break;
+                        case KeyEvent.VK_C: //NUM 67
+                            //cliente.client.shot = true;
+                            messageDispatcherShot();
+                            System.out.println("Atirou! ");
                             break;
                         default:
                             break;
@@ -116,7 +150,7 @@ public class TCPServerAtivosHandler extends Thread {
                     System.out.println("playerName: " + cliente.client.playerName);
                 }
 
-                messageDispatcher();
+                cliente.client.shot = false;
             } catch (Exception ex) {
                 System.out.println("exception error: " + ex.getMessage());
                 break;
