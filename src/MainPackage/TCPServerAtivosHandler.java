@@ -66,6 +66,30 @@ public class TCPServerAtivosHandler extends Thread {
             }
         }
     }
+    
+        public synchronized void messageDispatcherInstantiate(String playerName) throws IOException {
+        float x = cliente.client.x;
+        float y = cliente.client.y;
+        float r = cliente.client.rotation;
+        String message = 
+                "&instantiate|" + 
+                x + "|" + 
+                y + "|" + 
+                r + "|" + 
+                playerName;
+        char[] messageChar = message.toCharArray();
+        List<TCPServerConnection> clientes = this.caller.getClientes();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (TCPServerConnection cli : clientes) {
+            if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
+                messageChar = message.toCharArray();
+                cli.getOutput().println(messageChar);
+                cli.getOutput().flush();
+            }
+        }
+    }
 
     @Override
     public void run() {
@@ -92,7 +116,8 @@ public class TCPServerAtivosHandler extends Thread {
                 //Check message type
                 if (subMessages[0].equals("&connect")) {
                     cliente.client.playerName = subMessages[1];
-                    System.out.println("PlayeName definido: " + cliente.client.playerName);
+                    System.out.println("PlayerName definido: " + cliente.client.playerName);
+                    messageDispatcherInstantiate(cliente.client.playerName);
                 }
 
                 if (subMessages[0].equals("&input")) {

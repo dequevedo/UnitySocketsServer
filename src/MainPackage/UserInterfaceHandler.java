@@ -34,14 +34,14 @@ public class UserInterfaceHandler implements Runnable {
     public void run() {
         try {
             while (true) {
-                apagaBolinha();
+                /*apagaBolinha();
                 x += 1;
                 y += 1;
                 d = 10;
                 inc = 2;
                 pintaBolinha();
 
-                Thread.sleep(50);
+                Thread.sleep(50);*/
             }
 
         } catch (Exception e) {
