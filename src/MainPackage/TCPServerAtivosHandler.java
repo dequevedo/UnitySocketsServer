@@ -33,7 +33,8 @@ public class TCPServerAtivosHandler extends Thread {
         StringBuilder sb = new StringBuilder();
 
         for (TCPServerConnection cli : clientes) {
-            sb.append("&move|" + cli.client.toString());
+            sb.append(
+                    "&move|" + cli.client.toString() + "|" + "end");
             sb.append(";");
             message = String.valueOf(sb);
         }
@@ -49,34 +50,14 @@ public class TCPServerAtivosHandler extends Thread {
     }
 
     public synchronized void messageDispatcherShot() throws IOException {
-        float x = cliente.client.x;
-        float y = cliente.client.y;
-        float r = cliente.client.rotation;
-        String message = "&shoot|" + x + "|" + y + "|" + r;
-        char[] messageChar = message.toCharArray();
-        List<TCPServerConnection> clientes = this.caller.getClientes();
-
-        StringBuilder sb = new StringBuilder();
-
-        for (TCPServerConnection cli : clientes) {
-            if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
-                messageChar = message.toCharArray();
-                cli.getOutput().println(messageChar);
-                cli.getOutput().flush();
-            }
-        }
-    }
-    
-        public synchronized void messageDispatcherInstantiate(String playerName) throws IOException {
-        float x = cliente.client.x;
-        float y = cliente.client.y;
-        float r = cliente.client.rotation;
-        String message = 
-                "&instantiate|" + 
-                x + "|" + 
-                y + "|" + 
-                r + "|" + 
-                playerName;
+        String message
+                = "&shoot" + "|"
+                + "idPlaceholder" + "|"
+                + cliente.client.playerName + "|"
+                + cliente.client.x + "|"
+                + cliente.client.y + "|"
+                + cliente.client.rotation + "|"
+                + "end";
         char[] messageChar = message.toCharArray();
         List<TCPServerConnection> clientes = this.caller.getClientes();
 
@@ -91,6 +72,58 @@ public class TCPServerAtivosHandler extends Thread {
         }
     }
 
+    public synchronized void messageDispatcherInstantiate() throws IOException {
+        String message = "";
+        char[] messageChar = message.toCharArray();
+        List<TCPServerConnection> clientes = this.caller.getClientes();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (TCPServerConnection cli : clientes) {
+            sb.append("&instantiate|"
+                    + "idPlaceholder" + "|"
+                    + cliente.client.playerName + "|"
+                    + cliente.client.x + "|"
+                    + cliente.client.y + "|"
+                    + cliente.client.rotation + "|"
+                    + "end");
+            sb.append(";");
+            message = String.valueOf(sb);
+        }
+
+        for (TCPServerConnection cli : clientes) {
+            if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
+                messageChar = message.toCharArray();
+                messageChar[messageChar.length - 1] = ' ';
+                cli.getOutput().println(messageChar);
+                cli.getOutput().flush();
+            }
+        }
+    }
+
+    /*public synchronized void messageDispatcherInstantiate(String playerName) throws IOException {
+        float x = cliente.client.x;
+        float y = cliente.client.y;
+        float r = cliente.client.rotation;
+        String message
+                = "&instantiate|"
+                + x + "|"
+                + y + "|"
+                + r + "|"
+                + playerName;
+        char[] messageChar = message.toCharArray();
+        List<TCPServerConnection> clientes = this.caller.getClientes();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (TCPServerConnection cli : clientes) {
+            if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
+                messageChar = message.toCharArray();
+                cli.getOutput().println(messageChar);
+                cli.getOutput().flush();
+            }
+        }
+    }*/
     @Override
     public void run() {
 
@@ -117,7 +150,8 @@ public class TCPServerAtivosHandler extends Thread {
                 if (subMessages[0].equals("&connect")) {
                     cliente.client.playerName = subMessages[1];
                     System.out.println("PlayerName definido: " + cliente.client.playerName);
-                    messageDispatcherInstantiate(cliente.client.playerName);
+
+                    messageDispatcherInstantiate();
                 }
 
                 if (subMessages[0].equals("&input")) {
