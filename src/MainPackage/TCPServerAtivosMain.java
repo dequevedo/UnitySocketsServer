@@ -10,7 +10,6 @@ public class TCPServerAtivosMain extends Thread {
 
     private List<TCPServerConnection> clientes;
     private ServerSocket server;
-    
 
     public TCPServerAtivosMain(int porta) throws IOException {
         this.server = new ServerSocket(porta);
@@ -33,7 +32,7 @@ public class TCPServerAtivosMain extends Thread {
             }
         }
     }
-    
+
     public synchronized void novoCliente(TCPServerConnection cliente) throws IOException {
         clientes.add(cliente);
     }
@@ -45,7 +44,7 @@ public class TCPServerAtivosMain extends Thread {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
-        System.out.println("Cliente removido:"+cliente.client.id);
+        System.out.println("Cliente removido:" + cliente.client.id);
         cliente.getOutput().close();
         try {
             cliente.getSocket().close();

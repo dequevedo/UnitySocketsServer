@@ -1,7 +1,5 @@
 package MainPackage;
 
-
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,8 +15,8 @@ public class TCPServerConnection {
 
     public TCPServerConnection(Socket socket, int id) {
         this.socket = socket;
-        System.out.println("Client: "+socket.getInetAddress());
-        this.client = new Client(id, "Desconhecido", 0, 0, 0, (float)0.1, 0);
+        //System.out.println("Client: " + socket.getInetAddress());
+        this.client = new Client(id, "Desconhecido", 0, 0, 0, (float) 0.1, 0);
         try {
             this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.output = new PrintWriter(this.socket.getOutputStream(), true);
