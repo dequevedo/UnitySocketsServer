@@ -2,13 +2,22 @@ package MainPackage;
 
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TCPServerAtivosHandler extends Thread {
 
+    boolean bulletDebugIn = false;
+    boolean inputDebugIn = false;
+    boolean connectDebugIn = false;
+
+    boolean sentMessageDebug = false;
+
     private TCPServerConnection cliente;
     private TCPServerAtivosMain caller;
     private List<TCPServerConnection> clientes;
+
+    private List<Bullet> bulletList = new ArrayList<Bullet>();
 
     public TCPServerAtivosHandler(TCPServerConnection cliente, TCPServerAtivosMain caller) throws IOException {
         this.caller = caller;
@@ -56,7 +65,9 @@ public class TCPServerAtivosHandler extends Thread {
             }
         }
 
-        System.out.println("Mensagem Enviada: " + message);
+        if (sentMessageDebug) {
+            System.out.println("Mensagem Enviada: " + message);
+        }
     }
 
     public synchronized void messageDispatcherShot() throws IOException {
@@ -119,35 +130,21 @@ public class TCPServerAtivosHandler extends Thread {
         }
     }
 
-    /*public synchronized void messageDispatcherInstantiate(String playerName) throws IOException {
-     float x = cliente.client.x;
-     float y = cliente.client.y;
-     float r = cliente.client.rotation;
-     String message
-     = "&instantiate|"
-     + x + "|"
-     + y + "|"
-     + r + "|"
-     + playerName;
-     char[] messageChar = message.toCharArray();
-     List<TCPServerConnection> clientes = this.caller.getClientes();
-
-     StringBuilder sb = new StringBuilder();
-
-     for (TCPServerConnection cli : clientes) {
-     if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
-     messageChar = message.toCharArray();
-     cli.getOutput().println(messageChar);
-     cli.getOutput().flush();
-     }
-     }
-     }*/
     @Override
     public void run() {
 
         String fullMessage = "";
         while (true) {
             try {
+                //TERMINAR!!!
+                if (!bulletList.isEmpty()) {
+                    for (Bullet bullet : bulletList) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(bullet.toString());
+                        
+                    }
+                }
+
                 if (this.cliente.getSocket().isConnected() && this.cliente.getInput() != null) {
                     fullMessage = this.cliente.getInput().readLine();
                 } else {
@@ -158,7 +155,7 @@ public class TCPServerAtivosHandler extends Thread {
                 }
 
                 //Split message received, and print obtained values
-                System.out.println("Full Message: " + fullMessage);
+                //System.out.println("Full Message: " + fullMessage);
                 String[] subMessages = fullMessage.split("\\|");
                 for (int i = 0; i < subMessages.length; i++) {
                     //System.out.println("Message [" + i + "] :" + subMessages[i]);
@@ -167,23 +164,39 @@ public class TCPServerAtivosHandler extends Thread {
                 //Check message type
                 if (subMessages[0].equals("#connect")) {
                     cliente.client.playerName = subMessages[1];
-                    System.out.println("PlayerName definido: " + cliente.client.playerName);
+                    if (connectDebugIn) {
+                        System.out.println("Connect Message: " + fullMessage);
+                    }
+                    //System.out.println("PlayerName definido: " + cliente.client.playerName);
 
                     messageDispatcherInstantiate();
                 }
 
                 if (subMessages[0].equals("#connect2")) {
                     cliente.client.playerName = subMessages[1];
-                    System.out.println("PlayerName definido: " + cliente.client.playerName);
+                    if (connectDebugIn) {
+                        System.out.println("Connect2 Message: " + fullMessage);
+                    }
+                    //System.out.println("PlayerName definido: " + cliente.client.playerName);
 
                     messageDispatcherInstantiate();
                 }
 
                 if (subMessages[0].equals("#input")) {
+                    if (inputDebugIn) {
+                        System.out.println("Input Message: " + fullMessage);
+                    }
                     messageInput(subMessages[1]);
                 }
+
+                if (subMessages[0].equals("#bullet")) {
+                    if (bulletDebugIn) {
+                        System.out.println("Bullet Message: " + fullMessage);
+                    }
+                    //messageInput(subMessages[1]);
+                }
             } catch (Exception ex) {
-                System.out.println("exception error: " + ex.getMessage());
+                System.out.println("exception error (1): " + ex.getMessage());
                 break;
             }
         }
