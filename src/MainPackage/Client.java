@@ -1,6 +1,8 @@
 package MainPackage;
 
 import com.google.gson.Gson;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Client {
 
@@ -11,6 +13,7 @@ public class Client {
     public float z;
     public float inc;
     public float rotation;
+    public List<Bullet> bulletList = new ArrayList<>();;
     Gson gson;
 
     public Client(int id, String playerName, float x, float y, float z, float inc, float rotation) {
@@ -23,6 +26,10 @@ public class Client {
         this.inc = inc;
         this.rotation = rotation;
         Gson gson = new Gson();
+    }
+    
+    public void addBullet(Bullet bullet){
+        bulletList.add(bullet);
     }
 
     public String toString() {

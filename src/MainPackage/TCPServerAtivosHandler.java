@@ -2,12 +2,11 @@ package MainPackage;
 
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TCPServerAtivosHandler extends Thread {
 
-    boolean bulletDebugIn = false;
+    boolean bulletDebugIn = true;
     boolean inputDebugIn = false;
     boolean connectDebugIn = false;
 
@@ -16,8 +15,6 @@ public class TCPServerAtivosHandler extends Thread {
     private TCPServerConnection cliente;
     private TCPServerAtivosMain caller;
     private List<TCPServerConnection> clientes;
-
-    private List<Bullet> bulletList = new ArrayList<Bullet>();
 
     public TCPServerAtivosHandler(TCPServerConnection cliente, TCPServerAtivosMain caller) throws IOException {
         this.caller = caller;
@@ -130,6 +127,49 @@ public class TCPServerAtivosHandler extends Thread {
         }
     }
 
+    public synchronized void messageDispatcherBulletPosition(Bullet bullet) throws IOException {
+        String message = "";
+        char[] messageChar = message.toCharArray();
+        List<TCPServerConnection> clientes = this.caller.getClientes();
+
+        StringBuilder sb = new StringBuilder();
+        
+        //#bullet|0|0,0001099587|2,703996|&
+        
+
+        for (TCPServerConnection cli : clientes) {
+            sb.append("#bulletmove|" 
+                    + cliente.client.id + "|"
+                    + bullet.bulletId + "|"  
+                    + bullet.x + "|"
+                    + bullet.y + "|"
+                    + "&");
+            sb.append(";");
+            message = String.valueOf(sb);
+        }
+
+        for (TCPServerConnection cli : clientes) {
+            if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
+                //messageChar = message.toCharArray();
+
+                char[] msg2 = new char[message.toCharArray().length - 1];
+
+                for (int i = 0; i < msg2.length; i++) {
+                    msg2[i] = message.toCharArray()[i];
+                    //char n = msg2[i];
+                }
+
+                //messageChar[messageChar.length - 1] = ' ';
+                cli.getOutput().println(msg2);
+                cli.getOutput().flush();
+            }
+        }
+
+        if (sentMessageDebug) {
+            System.out.println("Mensagem Enviada: " + message);
+        }
+    }
+
     @Override
     public void run() {
 
@@ -137,14 +177,15 @@ public class TCPServerAtivosHandler extends Thread {
         while (true) {
             try {
                 //TERMINAR!!!
-                if (!bulletList.isEmpty()) {
-                    for (Bullet bullet : bulletList) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(bullet.toString());
-                        
-                    }
-                }
 
+                /*if (!bulletList.isEmpty()) {
+                 StringBuilder sb = new StringBuilder();
+                 for (Bullet bullet : bulletList) {
+                 sb.append(bullet.toString());
+                       
+                 }
+                 //System.out.println("Bullets: " + sb);
+                 }*/
                 if (this.cliente.getSocket().isConnected() && this.cliente.getInput() != null) {
                     fullMessage = this.cliente.getInput().readLine();
                 } else {
@@ -157,6 +198,7 @@ public class TCPServerAtivosHandler extends Thread {
                 //Split message received, and print obtained values
                 //System.out.println("Full Message: " + fullMessage);
                 String[] subMessages = fullMessage.split("\\|");
+                //System.out.println("Sub[0]: " + subMessages[0]);
                 for (int i = 0; i < subMessages.length; i++) {
                     //System.out.println("Message [" + i + "] :" + subMessages[i]);
                 }
@@ -191,7 +233,22 @@ public class TCPServerAtivosHandler extends Thread {
 
                 if (subMessages[0].equals("#bullet")) {
                     if (bulletDebugIn) {
+
+                        //Não existe a necessidade de criar um objeto para comparar, basta comparar a string id
+                        Bullet newBullet = new Bullet(
+                                Integer.parseInt(subMessages[1]),
+                                Float.parseFloat(subMessages[2].replace(',', '.')),
+                                Float.parseFloat(subMessages[3].replace(',', '.'))
+                        );
+
+                        if (!newBullet.alreadyExists(cliente.client.bulletList)) {
+                            cliente.client.bulletList.add(newBullet);
+                        }
+                        
+                        messageDispatcherBulletPosition(newBullet);
+
                         System.out.println("Bullet Message: " + fullMessage);
+                        System.out.println("From client Id: " + cliente.client.id);
                     }
                     //messageInput(subMessages[1]);
                 }

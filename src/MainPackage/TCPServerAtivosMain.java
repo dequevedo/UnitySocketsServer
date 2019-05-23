@@ -44,6 +44,7 @@ public class TCPServerAtivosMain extends Thread {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
+        
         System.out.println("Cliente removido:" + cliente.client.id);
         cliente.getOutput().close();
         try {
