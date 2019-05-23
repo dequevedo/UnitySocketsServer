@@ -137,7 +137,7 @@ public class TCPServerAtivosHandler extends Thread {
         //#bullet|0|0,0001099587|2,703996|&
         for (TCPServerConnection cli : clientes) {
             sb.append("#bulletmove|"
-                    + cliente.client.id + "|"
+                    + cliente.client.playerName + "|"
                     + bullet.bulletId + "|"
                     + bullet.x + "|"
                     + bullet.y + "|"
@@ -230,26 +230,19 @@ public class TCPServerAtivosHandler extends Thread {
                 }
 
                 if (subMessages[0].equals("#bullet")) {
-                    if (bulletDebugIn) {
+                    //Não existe a necessidade de criar um objeto para comparar, basta comparar a string id
+                    Bullet newBullet = new Bullet(
+                            subMessages[1], //PlayerId
+                            Integer.parseInt(subMessages[2]), //BulletId
+                            Float.parseFloat(subMessages[3].replace(',', '.')), //X position
+                            Float.parseFloat(subMessages[4].replace(',', '.')) //Y position
+                    );
 
-                        System.out.println("Bullet Message: " + fullMessage);
-                        System.out.println("From client Id: " + cliente.client.id);
-
-                        //Não existe a necessidade de criar um objeto para comparar, basta comparar a string id
-                        Bullet newBullet = new Bullet(
-                                subMessages[1], //PlayerId
-                                Integer.parseInt(subMessages[2]), //BulletId
-                                Float.parseFloat(subMessages[3].replace(',', '.')), //X position
-                                Float.parseFloat(subMessages[4].replace(',', '.')) //Y position
-                        );
-
-                        if (!newBullet.alreadyExists(cliente.client.bulletList)) {
-                            cliente.client.bulletList.add(newBullet);
-                        }
-
-                        messageDispatcherBulletPosition(newBullet);
+                    if (!newBullet.alreadyExists(cliente.client.bulletList)) {
+                        cliente.client.bulletList.add(newBullet);
                     }
-                    //messageInput(subMessages[1]);
+
+                    messageDispatcherBulletPosition(newBullet);
                 }
             } catch (Exception ex) {
                 System.out.println("exception error (1): " + ex.getMessage());
