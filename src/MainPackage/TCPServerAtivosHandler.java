@@ -133,14 +133,12 @@ public class TCPServerAtivosHandler extends Thread {
         List<TCPServerConnection> clientes = this.caller.getClientes();
 
         StringBuilder sb = new StringBuilder();
-        
-        //#bullet|0|0,0001099587|2,703996|&
-        
 
+        //#bullet|0|0,0001099587|2,703996|&
         for (TCPServerConnection cli : clientes) {
-            sb.append("#bulletmove|" 
+            sb.append("#bulletmove|"
                     + cliente.client.id + "|"
-                    + bullet.bulletId + "|"  
+                    + bullet.bulletId + "|"
                     + bullet.x + "|"
                     + bullet.y + "|"
                     + "&");
@@ -234,21 +232,22 @@ public class TCPServerAtivosHandler extends Thread {
                 if (subMessages[0].equals("#bullet")) {
                     if (bulletDebugIn) {
 
+                        System.out.println("Bullet Message: " + fullMessage);
+                        System.out.println("From client Id: " + cliente.client.id);
+
                         //Não existe a necessidade de criar um objeto para comparar, basta comparar a string id
                         Bullet newBullet = new Bullet(
-                                Integer.parseInt(subMessages[1]),
-                                Float.parseFloat(subMessages[2].replace(',', '.')),
-                                Float.parseFloat(subMessages[3].replace(',', '.'))
+                                subMessages[1], //PlayerId
+                                Integer.parseInt(subMessages[2]), //BulletId
+                                Float.parseFloat(subMessages[3].replace(',', '.')), //X position
+                                Float.parseFloat(subMessages[4].replace(',', '.')) //Y position
                         );
 
                         if (!newBullet.alreadyExists(cliente.client.bulletList)) {
                             cliente.client.bulletList.add(newBullet);
                         }
-                        
-                        messageDispatcherBulletPosition(newBullet);
 
-                        System.out.println("Bullet Message: " + fullMessage);
-                        System.out.println("From client Id: " + cliente.client.id);
+                        messageDispatcherBulletPosition(newBullet);
                     }
                     //messageInput(subMessages[1]);
                 }
@@ -307,11 +306,11 @@ public class TCPServerAtivosHandler extends Thread {
                         messageDispatcher();
                         break;
                     case KeyEvent.VK_Z:
-                        cliente.client.rotation -= 2f;
+                        cliente.client.rotation -= 1.5f;
                         messageDispatcher();
                         break;
                     case KeyEvent.VK_X:
-                        cliente.client.rotation += 2f;
+                        cliente.client.rotation += 1.5f;
                         messageDispatcher();
                         break;
                     case KeyEvent.VK_C: //NUM 67
