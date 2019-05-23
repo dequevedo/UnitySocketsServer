@@ -307,11 +307,11 @@ public class TCPServerAtivosHandler extends Thread {
                         messageDispatcher();
                         break;
                     case KeyEvent.VK_Z:
-                        cliente.client.rotation -= 1f;
+                        cliente.client.rotation -= 2f;
                         messageDispatcher();
                         break;
                     case KeyEvent.VK_X:
-                        cliente.client.rotation += 1f;
+                        cliente.client.rotation += 2f;
                         messageDispatcher();
                         break;
                     case KeyEvent.VK_C: //NUM 67
