@@ -40,7 +40,7 @@ public class TCPServerAtivosHandler extends Thread {
 
         for (TCPServerConnection cli : clientes) {
             sb.append(
-                    "#move|" + cli.client.toString() + "|" + "&");
+                    "#move2|" + cli.client.toString() + "|" + "&");
             sb.append(";");
             message = String.valueOf(sb);
         }
@@ -134,7 +134,6 @@ public class TCPServerAtivosHandler extends Thread {
 
         StringBuilder sb = new StringBuilder();
 
-        //#bullet|0|0,0001099587|2,703996|&
         for (TCPServerConnection cli : clientes) {
             sb.append("#bulletmove|"
                     + cliente.client.playerName + "|"
@@ -174,16 +173,6 @@ public class TCPServerAtivosHandler extends Thread {
         String fullMessage = "";
         while (true) {
             try {
-                //TERMINAR!!!
-
-                /*if (!bulletList.isEmpty()) {
-                 StringBuilder sb = new StringBuilder();
-                 for (Bullet bullet : bulletList) {
-                 sb.append(bullet.toString());
-                       
-                 }
-                 //System.out.println("Bullets: " + sb);
-                 }*/
                 if (this.cliente.getSocket().isConnected() && this.cliente.getInput() != null) {
                     fullMessage = this.cliente.getInput().readLine();
                 } else {
@@ -196,6 +185,7 @@ public class TCPServerAtivosHandler extends Thread {
                 //Split message received, and print obtained values
                 //System.out.println("Full Message: " + fullMessage);
                 String[] subMessages = fullMessage.split("\\|");
+
                 //System.out.println("Sub[0]: " + subMessages[0]);
                 for (int i = 0; i < subMessages.length; i++) {
                     //System.out.println("Message [" + i + "] :" + subMessages[i]);
@@ -207,7 +197,6 @@ public class TCPServerAtivosHandler extends Thread {
                     if (connectDebugIn) {
                         System.out.println("Connect Message: " + fullMessage);
                     }
-                    //System.out.println("PlayerName definido: " + cliente.client.playerName);
 
                     messageDispatcherInstantiate();
                 }
@@ -222,11 +211,19 @@ public class TCPServerAtivosHandler extends Thread {
                     messageDispatcherInstantiate();
                 }
 
-                if (subMessages[0].equals("#input")) {
+                //Old input system
+                /*if (subMessages[0].equals("#input")) {
                     if (inputDebugIn) {
                         System.out.println("Input Message: " + fullMessage);
                     }
                     messageInput(subMessages[1]);
+                }*/
+                if (subMessages[0].equals("#player")) {
+                    updatePlayerStatus(subMessages);
+                }
+
+                if (subMessages[0].equals("#shot")) {
+                    messageDispatcherShot();
                 }
 
                 if (subMessages[0].equals("#bullet")) {
@@ -252,11 +249,21 @@ public class TCPServerAtivosHandler extends Thread {
         encerrar();
     }
 
-    public void messageInput(String message) {
+    public void updatePlayerStatus(String[] subMessages) {
+        try {
+            cliente.client.x = Float.parseFloat(subMessages[2].replace(',', '.'));
+            cliente.client.y = Float.parseFloat(subMessages[3].replace(',', '.'));
+            cliente.client.rotation = Float.parseFloat(subMessages[4].replace(',', '.'));
+
+            messageDispatcher();
+        } catch (Exception e) {
+        }
+    }
+
+    /*public void messageInput(String message) {
         try {
             if (message.matches("[0-9]+")) {
                 int tecla = Integer.parseInt(message);
-                //System.out.println("entrou no switch case");
                 switch (tecla) {
                     case KeyEvent.VK_A:
                         if (cliente.client.inc > 0) {
@@ -316,5 +323,5 @@ public class TCPServerAtivosHandler extends Thread {
         } catch (Exception ex) {
 
         }
-    }
+    }*/
 }
