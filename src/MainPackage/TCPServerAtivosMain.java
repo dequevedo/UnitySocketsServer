@@ -13,7 +13,6 @@ public class TCPServerAtivosMain extends Thread {
 
     public TCPServerAtivosMain(int porta) throws IOException {
         this.server = new ServerSocket(porta);
-        System.out.println(this.getClass().getSimpleName() + " rodando na porta: " + server.getLocalPort());
         this.clientes = new ArrayList<TCPServerConnection>();
     }
 

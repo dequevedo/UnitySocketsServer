@@ -28,7 +28,29 @@ public class TCPServerAtivosHandler extends Thread {
     }
 
     private void encerrar() {
-        this.caller.removerCliente(this.cliente);
+        try {
+            messageDispatcherClientDisconnected(this.cliente);
+            this.caller.removerCliente(this.cliente);
+        } catch (Exception e) {
+        }
+    }
+
+    public synchronized void messageDispatcherClientDisconnected(TCPServerConnection c) throws IOException {
+        String message
+                = "#disconnected_S" + "|"
+                + cliente.client.id + "|"
+                + cliente.client.playerName + "|"
+                + "&";
+        char[] messageChar = message.toCharArray();
+        List<TCPServerConnection> clientes = this.caller.getClientes();
+
+        for (TCPServerConnection cli : clientes) {
+            if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
+                messageChar = message.toCharArray();
+                cli.getOutput().println(messageChar);
+                cli.getOutput().flush();
+            }
+        }
     }
 
     public synchronized void messageDispatcher() throws IOException {
@@ -40,7 +62,14 @@ public class TCPServerAtivosHandler extends Thread {
 
         for (TCPServerConnection cli : clientes) {
             sb.append(
-                    "#move2|" + cli.client.toString() + "|" + "&");
+                    "#move_S" + "|"
+                    + cli.client.id + "|"
+                    + cli.client.playerName + "|"
+                    + cli.client.x + "|"
+                    + cli.client.y + "|"
+                    + cli.client.inc + "|"
+                    + cli.client.rotation + "|"
+                    + "&");
             sb.append(";");
             message = String.valueOf(sb);
         }
@@ -67,29 +96,6 @@ public class TCPServerAtivosHandler extends Thread {
         }
     }
 
-    public synchronized void messageDispatcherShot() throws IOException {
-        String message
-                = "#shoot" + "|"
-                + "idPlaceholder" + "|"
-                + cliente.client.playerName + "|"
-                + cliente.client.x + "|"
-                + cliente.client.y + "|"
-                + cliente.client.rotation + "|"
-                + "&";
-        char[] messageChar = message.toCharArray();
-        List<TCPServerConnection> clientes = this.caller.getClientes();
-
-        StringBuilder sb = new StringBuilder();
-
-        for (TCPServerConnection cli : clientes) {
-            if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
-                messageChar = message.toCharArray();
-                cli.getOutput().println(messageChar);
-                cli.getOutput().flush();
-            }
-        }
-    }
-
     public synchronized void messageDispatcherInstantiate() throws IOException {
         String message = "";
         char[] messageChar = message.toCharArray();
@@ -98,8 +104,8 @@ public class TCPServerAtivosHandler extends Thread {
         StringBuilder sb = new StringBuilder();
 
         for (TCPServerConnection cli : clientes) {
-            sb.append("#instantiate|"
-                    + "id" + "|"
+            sb.append("#instantiate_S|"
+                    + cliente.client.id + "|"
                     + cliente.client.playerName + "|"
                     + cliente.client.x + "|"
                     + cliente.client.y + "|"
@@ -127,6 +133,29 @@ public class TCPServerAtivosHandler extends Thread {
         }
     }
 
+    public synchronized void messageDispatcherShot() throws IOException {
+        String message
+                = "#shoot_S" + "|"
+                + cliente.client.id + "|"
+                + cliente.client.playerName + "|"
+                + "delete" + "|"
+                + cliente.client.x + "|"
+                + cliente.client.y + "|"
+                + cliente.client.rotation + "|"
+                + "&";
+        char[] messageChar = message.toCharArray();
+        List<TCPServerConnection> clientes = this.caller.getClientes();
+        System.out.println("Atirou:" + message);
+
+        for (TCPServerConnection cli : clientes) {
+            if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
+                messageChar = message.toCharArray();
+                cli.getOutput().println(messageChar);
+                cli.getOutput().flush();
+            }
+        }
+    }
+
     public synchronized void messageDispatcherBulletPosition(Bullet bullet) throws IOException {
         String message = "";
         char[] messageChar = message.toCharArray();
@@ -135,7 +164,8 @@ public class TCPServerAtivosHandler extends Thread {
         StringBuilder sb = new StringBuilder();
 
         for (TCPServerConnection cli : clientes) {
-            sb.append("#bulletmove|"
+            sb.append("#bulletmove_S|"
+                    + cliente.client.id + "|"
                     + cliente.client.playerName + "|"
                     + bullet.bulletId + "|"
                     + bullet.x + "|"
@@ -182,17 +212,11 @@ public class TCPServerAtivosHandler extends Thread {
                     break;
                 }
 
-                //Split message received, and print obtained values
                 //System.out.println("Full Message: " + fullMessage);
                 String[] subMessages = fullMessage.split("\\|");
 
-                //System.out.println("Sub[0]: " + subMessages[0]);
-                for (int i = 0; i < subMessages.length; i++) {
-                    //System.out.println("Message [" + i + "] :" + subMessages[i]);
-                }
-
                 //Check message type
-                if (subMessages[0].equals("#connect")) {
+                if (subMessages[0].equals("#connect_C")) {
                     cliente.client.playerName = subMessages[1];
                     if (connectDebugIn) {
                         System.out.println("Connect Message: " + fullMessage);
@@ -201,32 +225,16 @@ public class TCPServerAtivosHandler extends Thread {
                     messageDispatcherInstantiate();
                 }
 
-                if (subMessages[0].equals("#connect2")) {
-                    cliente.client.playerName = subMessages[1];
-                    if (connectDebugIn) {
-                        System.out.println("Connect2 Message: " + fullMessage);
-                    }
-                    //System.out.println("PlayerName definido: " + cliente.client.playerName);
-
-                    messageDispatcherInstantiate();
-                }
-
-                //Old input system
-                /*if (subMessages[0].equals("#input")) {
-                    if (inputDebugIn) {
-                        System.out.println("Input Message: " + fullMessage);
-                    }
-                    messageInput(subMessages[1]);
-                }*/
-                if (subMessages[0].equals("#player")) {
+                if (subMessages[0].equals("#playerStatus_C")) {
                     updatePlayerStatus(subMessages);
                 }
 
-                if (subMessages[0].equals("#shot")) {
+                if (subMessages[0].equals("#shotFired_C")) {
+                    System.out.println("Shot Message: " + fullMessage);
                     messageDispatcherShot();
                 }
 
-                if (subMessages[0].equals("#bullet")) {
+                if (subMessages[0].equals("#bulletStatus_C")) {
                     //Não existe a necessidade de criar um objeto para comparar, basta comparar a string id
                     Bullet newBullet = new Bullet(
                             subMessages[1], //PlayerId
@@ -259,69 +267,4 @@ public class TCPServerAtivosHandler extends Thread {
         } catch (Exception e) {
         }
     }
-
-    /*public void messageInput(String message) {
-        try {
-            if (message.matches("[0-9]+")) {
-                int tecla = Integer.parseInt(message);
-                switch (tecla) {
-                    case KeyEvent.VK_A:
-                        if (cliente.client.inc > 0) {
-                            cliente.client.inc--;
-                        }
-                        messageDispatcher();
-                        break;
-                    case KeyEvent.VK_S:
-                        if (cliente.client.inc < 1) {
-                            cliente.client.inc++;
-                        }
-                        messageDispatcher();
-                        break;
-                    case KeyEvent.VK_Q:
-                        if (cliente.client.z > 2) {
-                            cliente.client.z--;
-                        }
-                        break;
-                    case KeyEvent.VK_W:
-                        if (cliente.client.z < 20) {
-                            cliente.client.z++;
-                        }
-                        messageDispatcher();
-                        break;
-                    case KeyEvent.VK_RIGHT:
-                        cliente.client.x += cliente.client.inc;
-
-                        messageDispatcher();
-                        break;
-                    case KeyEvent.VK_LEFT:
-                        cliente.client.x -= cliente.client.inc;
-                        messageDispatcher();
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        cliente.client.y -= cliente.client.inc;
-                        messageDispatcher();
-                        break;
-                    case KeyEvent.VK_UP:
-                        cliente.client.y += cliente.client.inc;
-                        messageDispatcher();
-                        break;
-                    case KeyEvent.VK_Z:
-                        cliente.client.rotation -= 1.5f;
-                        messageDispatcher();
-                        break;
-                    case KeyEvent.VK_X:
-                        cliente.client.rotation += 1.5f;
-                        messageDispatcher();
-                        break;
-                    case KeyEvent.VK_C: //NUM 67
-                        messageDispatcherShot();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        } catch (Exception ex) {
-
-        }
-    }*/
 }
