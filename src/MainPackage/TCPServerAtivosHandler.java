@@ -145,8 +145,7 @@ public class TCPServerAtivosHandler extends Thread {
                 + "&";
         char[] messageChar = message.toCharArray();
         List<TCPServerConnection> clientes = this.caller.getClientes();
-        System.out.println("Atirou:" + message);
-
+        
         for (TCPServerConnection cli : clientes) {
             if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
                 messageChar = message.toCharArray();
@@ -226,11 +225,11 @@ public class TCPServerAtivosHandler extends Thread {
                 }
 
                 if (subMessages[0].equals("#playerStatus_C")) {
+                    System.out.println(fullMessage);
                     updatePlayerStatus(subMessages);
                 }
 
                 if (subMessages[0].equals("#shotFired_C")) {
-                    System.out.println("Shot Message: " + fullMessage);
                     messageDispatcherShot();
                 }
 
