@@ -225,15 +225,17 @@ public class TCPServerAtivosHandler extends Thread {
                 }
 
                 if (subMessages[0].equals("#playerStatus_C")) {
-                    System.out.println(fullMessage);
+                    //System.out.println(fullMessage);
                     updatePlayerStatus(subMessages);
                 }
 
                 if (subMessages[0].equals("#shotFired_C")) {
+                    System.out.println(fullMessage);
                     messageDispatcherShot();
                 }
 
                 if (subMessages[0].equals("#bulletStatus_C")) {
+                    System.out.println(fullMessage);
                     //Não existe a necessidade de criar um objeto para comparar, basta comparar a string id
                     Bullet newBullet = new Bullet(
                             subMessages[1], //PlayerId
