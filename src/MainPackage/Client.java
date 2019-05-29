@@ -11,9 +11,10 @@ public class Client {
     public float z;
     public float inc;
     public float rotation;
+    public String alive;
     public List<Bullet> bulletList = new ArrayList<>();;
 
-    public Client(int id, String playerName, float x, float y, float z, float inc, float rotation) {
+    public Client(int id, String playerName, float x, float y, float z, float inc, float rotation, String alive) {
         System.out.println("New Client: " + id + "|" + playerName + "|" + x + "|" + y + "|" + z + "|" + inc);
         this.id = id;
         this.playerName = playerName;
@@ -22,6 +23,7 @@ public class Client {
         this.z = z;
         this.inc = inc;
         this.rotation = rotation;
+        this.alive = alive;
     }
     
     public void addBullet(Bullet bullet){

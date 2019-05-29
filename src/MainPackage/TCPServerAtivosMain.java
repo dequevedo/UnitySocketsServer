@@ -43,13 +43,41 @@ public class TCPServerAtivosMain extends Thread {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
-        
+
         System.out.println("Cliente removido:" + cliente.client.id);
         cliente.getOutput().close();
         try {
             cliente.getSocket().close();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+        }
+    }
+
+    public synchronized void removerCliente(String clientName) {
+        TCPServerConnection cliente = null;
+
+        for (TCPServerConnection x : clientes) {
+            if (x.client.playerName.equals(clientName)) {
+                cliente = x;
+            }
+        }
+
+        if (cliente != null) {
+            clientes.remove(cliente);
+
+            try {
+                cliente.getInput().close();
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
+
+            System.out.println("Cliente removido:" + cliente.client.id);
+            cliente.getOutput().close();
+            try {
+                 cliente.getSocket().close();
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
         }
     }
 

@@ -15,7 +15,7 @@ public class TCPServerConnection {
 
     public TCPServerConnection(Socket socket, int id) {
         this.socket = socket;
-        this.client = new Client(id, "Desconhecido", 0, 0, 0, (float) 0.1, 0);
+        this.client = new Client(id, "Desconhecido", 0, 0, 0, (float) 0.1, 0, "true");
         try {
             this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.output = new PrintWriter(this.socket.getOutputStream(), true);

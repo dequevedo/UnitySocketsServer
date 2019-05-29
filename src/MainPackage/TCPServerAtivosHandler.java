@@ -1,6 +1,5 @@
 package MainPackage;
 
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.List;
 
@@ -22,26 +21,24 @@ public class TCPServerAtivosHandler extends Thread {
         this.clientes = caller.getClientes();
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        encerrar();
-    }
-
-    private void encerrar() {
-        try {
-            messageDispatcherClientDisconnected(this.cliente);
-            this.caller.removerCliente(this.cliente);
-        } catch (Exception e) {
-        }
-    }
-
-    public synchronized void messageDispatcherClientDisconnected(TCPServerConnection c) throws IOException {
+    /*@Override
+     protected void finalize() throws Throwable {
+     encerrar();
+     }*/
+    /*private void encerrar() {
+     try {
+     messageDispatcherClientDisconnected(this.cliente);
+     this.caller.removerCliente(this.cliente);
+     } catch (Exception e) {
+     }
+     }*/
+    public synchronized void messageDispatcherClientDisconnected(String playerRemoved) throws IOException {
         String message
-                = "#disconnected_S" + "|"
-                + cliente.client.id + "|"
-                + cliente.client.playerName + "|"
+                = "#removePlayer_S" + "|"
+                + playerRemoved + "|"
                 + "&";
         char[] messageChar = message.toCharArray();
+
         List<TCPServerConnection> clientes = this.caller.getClientes();
 
         for (TCPServerConnection cli : clientes) {
@@ -69,6 +66,7 @@ public class TCPServerAtivosHandler extends Thread {
                     + cli.client.y + "|"
                     + cli.client.inc + "|"
                     + cli.client.rotation + "|"
+                    + cli.client.alive + "|"
                     + "&");
             sb.append(";");
             message = String.valueOf(sb);
@@ -145,7 +143,7 @@ public class TCPServerAtivosHandler extends Thread {
                 + "&";
         char[] messageChar = message.toCharArray();
         List<TCPServerConnection> clientes = this.caller.getClientes();
-        
+
         for (TCPServerConnection cli : clientes) {
             if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
                 messageChar = message.toCharArray();
@@ -230,12 +228,26 @@ public class TCPServerAtivosHandler extends Thread {
                 }
 
                 if (subMessages[0].equals("#shotFired_C")) {
-                    System.out.println(fullMessage);
+                    //System.out.println(fullMessage);
                     messageDispatcherShot();
                 }
 
-                if (subMessages[0].equals("#bulletStatus_C")) {
+                if (subMessages[0].equals("#disconnect_C")) {
                     System.out.println(fullMessage);
+                    
+                    for(TCPServerConnection x : clientes){
+                        if(x.client.playerName.equals(subMessages[1])){
+                            x.client.alive = "false";
+                            messageDispatcherClientDisconnected(subMessages[1]);
+                            break;
+                        }
+                    }
+
+                    //this.caller.removerCliente(subMessages[1]);
+                }
+
+                if (subMessages[0].equals("#bulletStatus_C")) {
+                    //System.out.println(fullMessage);
                     //Não existe a necessidade de criar um objeto para comparar, basta comparar a string id
                     Bullet newBullet = new Bullet(
                             subMessages[1], //PlayerId
@@ -255,7 +267,7 @@ public class TCPServerAtivosHandler extends Thread {
                 break;
             }
         }
-        encerrar();
+        //encerrar();
     }
 
     public void updatePlayerStatus(String[] subMessages) {
