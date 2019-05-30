@@ -21,17 +21,6 @@ public class TCPServerAtivosHandler extends Thread {
         this.clientes = caller.getClientes();
     }
 
-    /*@Override
-     protected void finalize() throws Throwable {
-     encerrar();
-     }*/
-    /*private void encerrar() {
-     try {
-     messageDispatcherClientDisconnected(this.cliente);
-     this.caller.removerCliente(this.cliente);
-     } catch (Exception e) {
-     }
-     }*/
     public synchronized void messageDispatcherClientDisconnected(String playerRemoved) throws IOException {
         String message
                 = "#removePlayer_S" + "|"
@@ -80,10 +69,8 @@ public class TCPServerAtivosHandler extends Thread {
 
                 for (int i = 0; i < msg2.length; i++) {
                     msg2[i] = message.toCharArray()[i];
-                    //char n = msg2[i];
                 }
 
-                //messageChar[messageChar.length - 1] = ' ';
                 cli.getOutput().println(msg2);
                 cli.getOutput().flush();
             }
@@ -115,16 +102,13 @@ public class TCPServerAtivosHandler extends Thread {
 
         for (TCPServerConnection cli : clientes) {
             if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
-                //messageChar = message.toCharArray();
 
                 char[] msg2 = new char[message.toCharArray().length - 1];
 
                 for (int i = 0; i < msg2.length; i++) {
                     msg2[i] = message.toCharArray()[i];
-                    //char n = msg2[i];
                 }
 
-                //messageChar[messageChar.length - 1] = ' ';
                 cli.getOutput().println(msg2);
                 cli.getOutput().flush();
             }
@@ -209,26 +193,18 @@ public class TCPServerAtivosHandler extends Thread {
                     break;
                 }
 
-                //System.out.println("Full Message: " + fullMessage);
                 String[] subMessages = fullMessage.split("\\|");
 
-                //Check message type
                 if (subMessages[0].equals("#connect_C")) {
                     cliente.client.playerName = subMessages[1];
-                    if (connectDebugIn) {
-                        System.out.println("Connect Message: " + fullMessage);
-                    }
-
                     messageDispatcherInstantiate();
                 }
 
                 if (subMessages[0].equals("#playerStatus_C")) {
-                    //System.out.println(fullMessage);
                     updatePlayerStatus(subMessages);
                 }
 
                 if (subMessages[0].equals("#shotFired_C")) {
-                    //System.out.println(fullMessage);
                     messageDispatcherShot();
                 }
 
@@ -242,12 +218,9 @@ public class TCPServerAtivosHandler extends Thread {
                             break;
                         }
                     }
-
-                    //this.caller.removerCliente(subMessages[1]);
                 }
 
                 if (subMessages[0].equals("#bulletStatus_C")) {
-                    //System.out.println(fullMessage);
                     //Não existe a necessidade de criar um objeto para comparar, basta comparar a string id
                     Bullet newBullet = new Bullet(
                             subMessages[1], //PlayerId
@@ -267,7 +240,6 @@ public class TCPServerAtivosHandler extends Thread {
                 break;
             }
         }
-        //encerrar();
     }
 
     public void updatePlayerStatus(String[] subMessages) {

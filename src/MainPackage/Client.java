@@ -38,7 +38,7 @@ public class Client {
         sb.append("|");
         sb.append(this.x);
         sb.append("|");
-        sb.append(this.y);
+        sb.append(this.z);
         sb.append("|");
         sb.append(this.inc);
         sb.append("|");

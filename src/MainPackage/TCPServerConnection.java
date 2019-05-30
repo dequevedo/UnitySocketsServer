@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Random;
 
 public class TCPServerConnection {
 
@@ -15,7 +16,14 @@ public class TCPServerConnection {
 
     public TCPServerConnection(Socket socket, int id) {
         this.socket = socket;
-        this.client = new Client(id, "Desconhecido", 0, 0, 0, (float) 0.1, 0, "true");
+
+        int max = 1;
+        int min = -1;
+        Random r = new Random();
+        int x = r.nextInt((max - min) + 1) + min;
+        int y = r.nextInt((max - min) + 1) + min;
+
+        this.client = new Client(id, "Desconhecido", x, y, 0, (float) 0.1, 0, "true");
         try {
             this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.output = new PrintWriter(this.socket.getOutputStream(), true);
