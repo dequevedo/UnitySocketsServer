@@ -143,6 +143,8 @@ public class TCPServerAtivosHandler extends Thread {
         List<TCPServerConnection> clientes = this.caller.getClientes();
 
         StringBuilder sb = new StringBuilder();
+        
+        
 
         for (TCPServerConnection cli : clientes) {
             sb.append("#bulletmove_S|"
@@ -155,6 +157,8 @@ public class TCPServerAtivosHandler extends Thread {
             sb.append(";");
             message = String.valueOf(sb);
         }
+        
+        System.out.println("Bullet Msg: " + sb);
 
         for (TCPServerConnection cli : clientes) {
             if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
