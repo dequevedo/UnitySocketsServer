@@ -39,7 +39,7 @@ public class TCPServerAtivosHandler extends Thread {
         }
     }
 
-    public synchronized void messageDispatcher() throws IOException {
+    public synchronized void messageDispatcherMove() throws IOException {
         String message = "";
         char[] messageChar = message.toCharArray();
         List<TCPServerConnection> clientes = this.caller.getClientes();
@@ -143,8 +143,6 @@ public class TCPServerAtivosHandler extends Thread {
         List<TCPServerConnection> clientes = this.caller.getClientes();
 
         StringBuilder sb = new StringBuilder();
-        
-        
 
         for (TCPServerConnection cli : clientes) {
             sb.append("#bulletmove_S|"
@@ -157,28 +155,19 @@ public class TCPServerAtivosHandler extends Thread {
             sb.append(";");
             message = String.valueOf(sb);
         }
-        
-        System.out.println("Bullet Msg: " + sb);
 
         for (TCPServerConnection cli : clientes) {
             if (cli.getSocket() != null && cli.getSocket().isConnected() && cli.getOutput() != null) {
-                //messageChar = message.toCharArray();
 
                 char[] msg2 = new char[message.toCharArray().length - 1];
 
                 for (int i = 0; i < msg2.length; i++) {
                     msg2[i] = message.toCharArray()[i];
-                    //char n = msg2[i];
                 }
 
-                //messageChar[messageChar.length - 1] = ' ';
                 cli.getOutput().println(msg2);
                 cli.getOutput().flush();
             }
-        }
-
-        if (sentMessageDebug) {
-            System.out.println("Mensagem Enviada: " + message);
         }
     }
 
@@ -197,6 +186,7 @@ public class TCPServerAtivosHandler extends Thread {
                     break;
                 }
 
+                //Divide a mensagem por pipe e obtém cada atributo da mensagem
                 String[] subMessages = fullMessage.split("\\|");
 
                 if (subMessages[0].equals("#connect_C")) {
@@ -248,11 +238,13 @@ public class TCPServerAtivosHandler extends Thread {
 
     public void updatePlayerStatus(String[] subMessages) {
         try {
+            
+            //Substitui as vírgulas por pontos
             cliente.client.x = Float.parseFloat(subMessages[2].replace(',', '.'));
             cliente.client.y = Float.parseFloat(subMessages[3].replace(',', '.'));
             cliente.client.rotation = Float.parseFloat(subMessages[4].replace(',', '.'));
 
-            messageDispatcher();
+            messageDispatcherMove();
         } catch (Exception e) {
         }
     }

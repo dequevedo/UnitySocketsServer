@@ -17,12 +17,14 @@ public class TCPServerConnection {
     public TCPServerConnection(Socket socket, int id) {
         this.socket = socket;
 
+        //Randomiza a posição inicial do player
         int max = 1;
         int min = -1;
         Random r = new Random();
         int x = r.nextInt((max - min) + 1) + min;
         int y = r.nextInt((max - min) + 1) + min;
 
+        //Cria um cliente padrão, depois os atributos serão modificados
         this.client = new Client(id, "Desconhecido", x, y, 0, (float) 0.1, 0, "true");
         try {
             this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));

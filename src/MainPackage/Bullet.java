@@ -20,6 +20,7 @@ public class Bullet {
         return "Bullet{" + playerId + "," + bulletId + "," + x + "," + y + '}';
     }
 
+    //Verifica se essa instância de Bullet já existe na lista recebida
     public boolean alreadyExists(List<Bullet> bulletList) {
         for (Bullet x : bulletList) {
             if (x.bulletId == this.bulletId) {
